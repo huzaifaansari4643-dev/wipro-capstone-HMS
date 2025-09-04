@@ -1,0 +1,226 @@
+//package com.hms.auth.controller.auth;
+//
+//import java.util.HashMap;
+//import java.util.Map;
+//import java.util.Optional;
+//
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.security.authentication.AuthenticationManager;
+//import org.springframework.security.authentication.BadCredentialsException;
+//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.web.bind.annotation.CrossOrigin;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RestController;
+//
+//import com.hms.auth.dto.AuthenticationRequest;
+//import com.hms.auth.dto.AuthenticationResponse;
+//import com.hms.auth.dto.SignupRequest;
+//import com.hms.auth.dto.UserDto;
+//import com.hms.auth.entity.User;
+//import com.hms.auth.repositories.UserRepository;
+//import com.hms.auth.services.auth.AuthService;
+//import com.hms.auth.services.jwt.UserService;
+//import com.hms.auth.utils.JwtUtil;
+//
+//import jakarta.validation.Valid;
+//import lombok.RequiredArgsConstructor;
+//
+//@RestController
+//@RequiredArgsConstructor
+//@RequestMapping("/api/auth")
+//@CrossOrigin("*")
+//public class AuthController {
+//
+//    private final AuthService authService;
+//    private final UserRepository userRepository;
+//    private final JwtUtil jwtUtil;
+//    private final UserService userService;
+//    private final AuthenticationManager authenticationManager;
+//
+//    /**
+//     * Signup endpoint
+//     */
+//    @PostMapping("/signup")
+//    public ResponseEntity<?> signupUser(@Valid @RequestBody SignupRequest signupRequest) {
+//
+//        if (authService.hasUserWithEmail(signupRequest.getEmail())) {
+//            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+//                    .body("User already exists with this email");
+//        }
+//
+//        UserDto createdUserDto = authService.signupUser(signupRequest);
+//
+//        if (createdUserDto == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not created");
+//        }
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdUserDto);
+//    }
+//
+//    /**
+//     * Login endpoint
+//     */
+//    @PostMapping("/login")
+//    public AuthenticationResponse login(@RequestBody AuthenticationRequest authenticationRequest) {
+//        try {
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            authenticationRequest.getEmail(),
+//                            authenticationRequest.getPassword()
+//                    )
+//            );
+//        } catch (BadCredentialsException e) {
+//            throw new BadCredentialsException("Incorrect password or email!");
+//        }
+//
+//        final UserDetails userDetails =
+//                userService.userDetailsService().loadUserByUsername(authenticationRequest.getEmail());
+//
+//        Optional<User> optionalUser = userRepository.findFirstByEmail(authenticationRequest.getEmail());
+//
+//        // Put role into claims
+//        Map<String, Object> claims = new HashMap<>();
+//        optionalUser.ifPresent(user -> claims.put("role", user.getUserRole().name()));
+//
+//        final String jwtToken = jwtUtil.generateToken(claims, userDetails);
+//
+//        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+//        if (optionalUser.isPresent()) {
+//            authenticationResponse.setJwt(jwtToken);
+//            authenticationResponse.setUserId(optionalUser.get().getId());
+//            authenticationResponse.setUserRole(optionalUser.get().getUserRole());
+//        }
+//
+//        return authenticationResponse;
+//    }
+//}
+
+
+package com.hms.auth.controller.auth;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hms.auth.dto.AuthenticationRequest;
+import com.hms.auth.dto.AuthenticationResponse;
+import com.hms.auth.dto.SignupRequest;
+import com.hms.auth.dto.UserDto;
+import com.hms.auth.entity.User;
+import com.hms.auth.repositories.UserRepository;
+import com.hms.auth.services.auth.AuthService;
+import com.hms.auth.services.jwt.UserService;
+import com.hms.auth.utils.JwtUtil;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/auth")
+@CrossOrigin("*")
+public class AuthController {
+
+    private final AuthService authService;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+
+    /**
+     * Signup endpoint
+     */
+    @PostMapping("/signup")
+    public ResponseEntity<?> signupUser(@Valid @RequestBody SignupRequest signupRequest) {
+        if (authService.hasUserWithEmail(signupRequest.getEmail())) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                    .body("User already exists with this email");
+        }
+
+        UserDto createdUserDto = authService.signupUser(signupRequest);
+        if (createdUserDto == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not created");
+        }
+
+        // Authenticate user and generate JWT token
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            signupRequest.getEmail(),
+                            signupRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authentication failed after signup");
+        }
+
+        final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(signupRequest.getEmail());
+        Optional<User> optionalUser = userRepository.findFirstByEmail(signupRequest.getEmail());
+        Map<String, Object> claims = new HashMap<>();
+        optionalUser.ifPresent(user -> claims.put("role", user.getUserRole().name()));
+        final String jwtToken = jwtUtil.generateToken(claims, userDetails);
+
+        // Build response with complete user data
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        authenticationResponse.setJwt(jwtToken);
+        authenticationResponse.setUserId(createdUserDto.getId());
+        authenticationResponse.setName(createdUserDto.getName());
+        authenticationResponse.setEmail(createdUserDto.getEmail());
+        authenticationResponse.setUserRole(createdUserDto.getUserRole());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(authenticationResponse);
+    }
+
+    /**
+     * Login endpoint
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authenticationRequest.getEmail(),
+                            authenticationRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("Incorrect password or email!");
+        }
+
+        final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getEmail());
+        Optional<User> optionalUser = userRepository.findFirstByEmail(authenticationRequest.getEmail());
+
+        // Put role into claims
+        Map<String, Object> claims = new HashMap<>();
+        optionalUser.ifPresent(user -> claims.put("role", user.getUserRole().name()));
+        final String jwtToken = jwtUtil.generateToken(claims, userDetails);
+
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            authenticationResponse.setJwt(jwtToken);
+            authenticationResponse.setUserId(user.getId());
+            authenticationResponse.setName(user.getName());
+            authenticationResponse.setEmail(user.getEmail());
+            authenticationResponse.setUserRole(user.getUserRole());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationResponse);
+    }
+}

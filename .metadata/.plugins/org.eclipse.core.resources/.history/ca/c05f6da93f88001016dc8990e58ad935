@@ -1,0 +1,96 @@
+//package com.hms.gateway.config;
+//
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+//import org.springframework.security.config.web.server.ServerHttpSecurity;
+//import org.springframework.security.web.server.SecurityWebFilterChain;
+//import org.springframework.web.cors.CorsConfiguration;
+//import org.springframework.web.cors.reactive.CorsConfigurationSource;
+//import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+//
+//import java.util.Arrays;
+//
+//@Configuration
+//@EnableWebFluxSecurity
+//public class SecurityConfig {
+//
+//    @Bean
+//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+//        return http
+//                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                // Disable default authentication as we're handling it in our filter
+//                .authorizeExchange(exchanges -> exchanges
+//                        // We're using our custom filter for authentication
+//                        .anyExchange().permitAll()
+//                )
+//                .build();
+//    }
+//
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
+//}
+
+package com.hms.gateway.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
+@Configuration
+@EnableWebFluxSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        return http
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeExchange(exchanges -> exchanges
+                        // Permit OPTIONS requests for CORS preflight
+                        .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        // Public endpoints
+                        .pathMatchers("/api/auth/**", "/actuator/**", "/debug/**").permitAll()
+                        // Protected routes (handled by JwtAuthenticationFilter)
+                        .anyExchange().authenticated()
+                )
+                .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Explicitly allow Angular origin
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        // Allow necessary methods
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Allow headers used by Angular (including JWT)
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Auth-User-Email", "X-Auth-User-Role"));
+        // Allow credentials for JWT
+        configuration.setAllowCredentials(true);
+        // Cache preflight for 30 minutes
+        configuration.setMaxAge(1800L);
+        // Expose headers if needed
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}

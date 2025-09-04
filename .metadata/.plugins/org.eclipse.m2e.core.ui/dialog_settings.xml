@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="MavenProjectImportWizardPage">
+		<list key="rootDirectory">
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/api-gateway"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/appointment-service"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/auth-service"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/billing-service"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/config-server"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/discovery-service"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/doctor-service"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/notification-service"/>
+			<item value="/Users/huzaifaansari/Downloads/backend_capstone-main/patient-service"/>
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+			<item value="[name]"/>
+		</list>
+	</section>
+	<section name="org.eclipse.m2e.core.pom.overview">
+	</section>
+	<section name="org.eclipse.m2e.core.pom.dependencies">
+	</section>
+</section>
