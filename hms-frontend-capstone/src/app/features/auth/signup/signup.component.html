@@ -1,0 +1,62 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Signup</h2>
+  </div>
+  <div class="card-content">
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="name">Name</label>
+        <input id="name" formControlName="name" type="text" class="input" />
+        <div class="error" *ngIf="signupForm.get('name')?.hasError('required') && signupForm.get('name')?.touched">
+          Name is required
+        </div>
+        <div class="error" *ngIf="signupForm.get('name')?.hasError('minlength') && signupForm.get('name')?.touched">
+          Name must be at least 5 characters
+        </div>
+        <div class="error" *ngIf="signupForm.get('name')?.hasError('maxlength') && signupForm.get('name')?.touched">
+          Name cannot exceed 50 characters
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input id="email" formControlName="email" type="email" class="input" />
+        <div class="error" *ngIf="signupForm.get('email')?.hasError('required') && signupForm.get('email')?.touched">
+          Email is required
+        </div>
+        <div class="error" *ngIf="signupForm.get('email')?.hasError('email') && signupForm.get('email')?.touched">
+          Invalid email
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input id="password" formControlName="password" type="password" class="input" />
+        <div class="error" *ngIf="signupForm.get('password')?.hasError('required') && signupForm.get('password')?.touched">
+          Password is required
+        </div>
+        <div class="error" *ngIf="signupForm.get('password')?.hasError('pattern') && signupForm.get('password')?.touched">
+          Password must contain uppercase, lowercase, digit, and special character
+        </div>
+        <div class="error" *ngIf="signupForm.get('password')?.hasError('minlength') && signupForm.get('password')?.touched">
+          Password must be at least 8 characters
+        </div>
+        <div class="error" *ngIf="signupForm.get('password')?.hasError('maxlength') && signupForm.get('password')?.touched">
+          Password cannot exceed 20 characters
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="role">Role</label>
+        <select id="role" formControlName="role" class="input">
+          <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+        </select>
+        <div class="error" *ngIf="signupForm.get('role')?.hasError('required') && signupForm.get('role')?.touched">
+          Role is required
+        </div>
+      </div>
+      <div class="error" *ngIf="error">{{ error }}</div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="signupForm.invalid">Signup</button>
+        <button type="button" class="btn-secondary" routerLink="/login">Login</button>
+      </div>
+    </form>
+  </div>
+</div>

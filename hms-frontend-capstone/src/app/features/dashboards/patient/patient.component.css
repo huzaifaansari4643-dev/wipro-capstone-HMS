@@ -1,0 +1,72 @@
+.dashboard-wrapper {
+  display: flex;
+}
+
+.dashboard-container {
+  font-family: Arial, sans-serif;
+  margin-left: 250px;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(to right, #e9ecef, #fff);
+  flex: 1;
+}
+
+.dashboard-card {
+  background-color: #FFFFFF;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.dashboard-card h2 {
+  font-size: 24px;
+  color: #9083D5;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-content {
+  margin-bottom: 20px;
+}
+
+.dashboard-content p {
+  font-size: 16px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.appointment-list {
+  margin-top: 20px;
+}
+
+.appointment-item {
+  border: 1px solid #9083D5;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #FFFFFF;
+}
+
+.appointment-item p {
+  margin: 5px 0;
+  text-align: left;
+  color: #333333;
+}
+
+.appointment-item p strong {
+  color: #9083D5;
+}
+
+.error {
+  color: #dc3545;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin-left: 0;
+  }
+}

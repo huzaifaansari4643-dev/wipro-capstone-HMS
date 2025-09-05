@@ -1,0 +1,51 @@
+.spacer {
+  flex: 1 1 auto;
+}
+mat-toolbar {
+  margin-bottom: 20px;
+}
+
+.primary{
+  background-color: #fff9f9;
+}
+
+
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f8f9fa;
+  position: relative;
+  z-index: 10;
+}
+button{
+  background: #9083D5;
+}
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #6c757d;
+}
+
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #6c757d;
+  font-size: 16px;
+}
+
+nav .btn {
+  padding: 5px 15px;
+  background-color: #9083D5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+nav .register-btn {
+  background-color: #6c757d;
+  color: white;
+}
